@@ -1,6 +1,7 @@
 {
   "extends": "../tslint.json",
   "rules": {
+    "new-parens": true,
     "directive-selector": [
       true,
       "attribute",

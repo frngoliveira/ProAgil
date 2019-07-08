@@ -82,15 +82,18 @@ namespace ProAgil.Api.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
+        [HttpPut("{EventoId}")]
         public async Task<IActionResult> Put(int EventoId, Evento model)
         {
             try 
             {
+                //Evento model= new Evento();
+
                 var evento = await _repo.GetEventoAsyncById(EventoId, false);
                 if(evento == null) return NotFound();
 
                 _repo.Update(model);
+                
                 if(await _repo.SaveChangesAsync())
                 {
                     return Created($"/api/evento/{model.Id}", model);
@@ -103,7 +106,7 @@ namespace ProAgil.Api.Controllers
             return BadRequest();
         }
 
-        [HttpDelete]
+        [HttpDelete("{EventoId}")]
         public async Task<IActionResult> Delete(int EventoId)
         {
             try 
@@ -123,7 +126,6 @@ namespace ProAgil.Api.Controllers
             }                                      
             return BadRequest();
         }
-
         #endregion
     }
 }
