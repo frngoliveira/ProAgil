@@ -39,11 +39,12 @@ namespace ProAgil.Repository
                 .Include(c => c.RedesSociais);
             if (includePalestrantes)
             {
-                query = query.AsNoTracking()
+                query = query
                     .Include(pe => pe.PalestrantesEventos)
                     .ThenInclude(p => p.Palestrante);
             }
-            query = query.OrderByDescending(c => c.DataEvento);
+            query = query.AsNoTracking()
+                .OrderBy(c => c.Id);
             return await query.ToArrayAsync();
         }
         public async Task<Evento[]> GetAllEventoAsyncByTema(string tema, bool includePalestrantes)

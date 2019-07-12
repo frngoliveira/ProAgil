@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using ProAgil.Repository;
+using ProAgil.Api.Dtos;
 using ProAgil.Domain;
+using AutoMapper;
 using System;
 
 namespace ProAgil.Api.Controllers
@@ -12,8 +15,10 @@ namespace ProAgil.Api.Controllers
     public class EventoController : ControllerBase
     {
         public readonly IProAgilRepository _repo;
-        public EventoController(IProAgilRepository repo)
+        private readonly IMapper _mapper;
+        public EventoController(IProAgilRepository repo, IMapper mapper)
         {
+            _mapper = mapper;
             _repo = repo;
         }
 
@@ -24,13 +29,14 @@ namespace ProAgil.Api.Controllers
         {
             try 
             {
-                var result = await _repo.GetAllEventoAsync(true);
+                var eventos = await _repo.GetAllEventoAsync(true);
+                var result = _mapper.Map<EventoDto[]>(eventos);
 
                 return Ok(result);
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");               
+                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados Falhou {ex.Message}");               
             }
         }
 
@@ -39,7 +45,10 @@ namespace ProAgil.Api.Controllers
         {
             try 
             {
-                var result = await _repo.GetEventoAsyncById(EventoId, true);
+                var evento = await _repo.GetEventoAsyncById(EventoId, true);
+
+                var result = _mapper.Map<EventoDto>(evento);
+
                 return Ok(result);
             }
             catch(Exception)
@@ -53,7 +62,8 @@ namespace ProAgil.Api.Controllers
         {
             try 
             {
-                var result = await _repo.GetAllEventoAsyncByTema(tema, true);
+                var eventos = await _repo.GetAllEventoAsyncByTema(tema, true);
+                var result = _mapper.Map<EventoDto[]>(eventos);
                 return Ok(result);
             }
             catch(Exception)
@@ -65,25 +75,27 @@ namespace ProAgil.Api.Controllers
 
         #region CRUD
         [HttpPost]
-        public async Task<IActionResult> Post(Evento model)
+        public async Task<IActionResult> Post(EventoDto model)
         {
             try 
             {
-                _repo.Add(model);
+                var evento = _mapper.Map<Evento>(model);
+
+                _repo.Add(evento);
                 if(await _repo.SaveChangesAsync())
                 {
-                    return Created($"/api/evento/{model.Id}", model);
+                    return Created($"/api/evento/{model.Id}", _mapper.Map<EventoDto>(evento));
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");               
+                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados Falhou {ex.Message}");               
             }
             return BadRequest();
         }
 
         [HttpPut("{EventoId}")]
-        public async Task<IActionResult> Put(int EventoId, Evento model)
+        public async Task<IActionResult> Put(int EventoId, EventoDto model)
         {
             try 
             {
@@ -92,16 +104,18 @@ namespace ProAgil.Api.Controllers
                 var evento = await _repo.GetEventoAsyncById(EventoId, false);
                 if(evento == null) return NotFound();
 
-                _repo.Update(model);
+                _mapper.Map(model, evento);
+
+                _repo.Update(evento);
                 
                 if(await _repo.SaveChangesAsync())
                 {
-                    return Created($"/api/evento/{model.Id}", model);
+                    return Created($"/api/evento/{model.Id}",  _mapper.Map<EventoDto>(evento));
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");               
+                return this.StatusCode(StatusCodes.Status500InternalServerError, $"Banco de Dados Falhou {ex.Message}");               
             }                                      
             return BadRequest();
         }

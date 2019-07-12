@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ProAgil.Repository;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProAgil.Api
@@ -32,6 +33,7 @@ namespace ProAgil.Api
             );
             services.AddScoped<IProAgilRepository, ProAgilRepository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddAutoMapper();
             services.AddCors();
         }
 
@@ -55,6 +57,7 @@ namespace ProAgil.Api
                                     .WithMethods("GET", "POST", "PUT", "DELETE")
                                     .AllowCredentials());
             app.UseStaticFiles();
+
             app.UseMvc();
         }
     }
