@@ -7,6 +7,8 @@ using ProAgil.Api.Dtos;
 using ProAgil.Domain;
 using AutoMapper;
 using System;
+using System.Web;
+using System.IO;
 
 namespace ProAgil.Api.Controllers
 {
@@ -65,6 +67,20 @@ namespace ProAgil.Api.Controllers
                 var eventos = await _repo.GetAllEventoAsyncByTema(tema, true);
                 var result = _mapper.Map<EventoDto[]>(eventos);
                 return Ok(result);
+            }
+            catch(Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Banco de Dados Falhou");               
+            }
+        }
+        [HttpPost("upload")]
+        public async Task<IActionResult> Upload()
+        {
+            try 
+            {
+                var files = Request.Form.Files[0];
+                var folderName = Path.Combine("Resource", "Images");
+                return Ok();
             }
             catch(Exception)
             {

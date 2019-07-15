@@ -37,10 +37,9 @@ export class EventosComponent implements OnInit {
     , private modalService: BsModalService
     // tslint:disable-next-line:align
     , private fb: FormBuilder
+    , private toastr: ToastrService
     // tslint:disable-next-line:align
     , private localeService?: BsLocaleService
-    // tslint:disable-next-line:align
-    , private toastr: ToastrService
     ) {
       this.localeService.use('pt-br');
     }
