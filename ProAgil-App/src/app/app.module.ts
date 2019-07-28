@@ -43,11 +43,11 @@ import { HttpClient } from 'selenium-webdriver/http';
          timeOut: 10000,
          positionClass: 'toast-bottom-right',
          preventDuplicates: true,
-       }),
-       AppRoutingModule,
-       HttpClientModule,
-       FormsModule,
-       ReactiveFormsModule
+      }),
+      AppRoutingModule,
+      HttpClientModule,
+      FormsModule,
+      ReactiveFormsModule
    ],
    providers: [
       EventoService

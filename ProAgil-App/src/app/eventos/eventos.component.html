@@ -36,7 +36,8 @@
   <tbody>
     <tr *ngFor="let evento of eventosFiltrados">
       <td>
-        <img *ngIf="mostrarImagem" src="http://localhost:5000/img/{{evento.imagemURL}}" [style.width.px]="imagemAltura"
+        <img *ngIf="mostrarImagem" src="http://localhost:5000/resource/images/{{evento.imagemURL}}?_ts={{dataAtual}}" 
+        [style.width.px]="imagemAltura"
         [style.margin.px]="imagemMargem">
       </td>
       <td>{{evento.id}}</td>
@@ -117,36 +118,30 @@ role="dialog" aria-labelledby="dialog-sizes-name1">
       <label>Local</label>
       <input type="text" class="form-control"
       [ngClass]="{'is-invalid': registerForm.get('local').errors && registerForm.get('local').touched}"
-      formControlName="local" placeholder="Local">
-      
+      formControlName="local" placeholder="Local">      
       <div *ngIf="registerForm.get('local').hasError('required') 
       && registerForm.get('local').touched" class="invalid-feedback">
       Local é obrigatorio.
-    </div>       
-    
+    </div>
   </div>
   <!-- Data Hora -->
   <div class="form-group col-md-4">
-    <label>Data e Hora</label>    
-    <input type="text" class="form-control" bsDatepicker formControlName="dataEvento"
-    value="{{dataEvento | DateTimeFormatPipe}}"
-    [(ngModel)]="dataEvento"
-    [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY hh:mm'}"
-    [ngClass]="{'is-invalid': registerForm.get('dataEvento').errors && registerForm.get('dataEvento').touched}">
-    
+    <label>Data e Hora</label>
+    <input type="text" class="form-control" bsDatepicker value="{{dataEvento | DateTimeFormatPipe}}"
+    [(ngModel)]="dataEvento" [bsConfig]="{ dateInputFormat : 'DD/MM/YYYY hh:mm' }" 
+    [ngClass]="{'is-invalid': registerForm.get('dataEvento').errors 
+    && registerForm.get('dataEvento').touched}" formControlName="dataEvento" placeholder="">    
     <div *ngIf="registerForm.get('dataEvento').hasError('required') 
     && registerForm.get('dataEvento').touched" class="invalid-feedback">
     Data e Hora é obrigatorio.
-  </div>
-  
+  </div>  
 </div>
 </div>  
 <div class="form-row">
   <div class="form-group col-md-3">
     <label>Qtd Pessoas</label>
     <input type="text" class="form-control" formControlName="qtdPessoas" placeholder="Qtd de pessoas"
-    [ngClass]="{'is-invalid': registerForm.get('qtdPessoas').errors && registerForm.get('qtdPessoas').touched}">
-    
+    [ngClass]="{'is-invalid': registerForm.get('qtdPessoas').errors && registerForm.get('qtdPessoas').touched}">    
     <div *ngIf="registerForm.get('qtdPessoas').hasError('required') 
     && registerForm.get('qtdPessoas').touched" class="invalid-feedback">
     Quantidade de Pessoas é obrigatorio.
@@ -160,9 +155,23 @@ role="dialog" aria-labelledby="dialog-sizes-name1">
 </div>
 <div class="form-group col-md-9">
   <label>Imagem</label>
-  <input type="text" class="form-control" formControlName="imagemURL" placeholder="Imagem"
-  [ngClass]="{'is-invalid': registerForm.get('imagemURL').errors && registerForm.get('imagemURL').touched}">
-  
+  <table>
+    <tr>
+      <td>
+        <button class="btn btn-success" (click)="file.click()">
+          Enviar Imagem
+        </button>
+        <input type="file" 
+        #file class="form-control" 
+        formControlName="imagemURL" 
+        placeholder="Imagem" 
+        (change)="onFileChange($event)" 
+        style="display: none"
+        [ngClass]="{'is-invalid': registerForm.get('imagemURL').errors 
+        && registerForm.get('imagemURL').touched}">
+      </td>
+    </tr>
+  </table>  
   <div *ngIf="registerForm.get('imagemURL').hasError('required') 
   && registerForm.get('imagemURL').touched" class="invalid-feedback">
   Imagem é obrigatorio.
@@ -214,30 +223,27 @@ E-mail inválido.
 
 
 <div bsModal #confirm="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
-	<div class="modal-dialog modal-sm">
-  		<div class="modal-content">
-    		<div class="modal-header">
-      			<h4 class="modal-title pull-left">
-        			Deletando Evento
-      			</h4>
-      			<button type="button" class="close pull-right" (click)="confirm.hide()" aria-label="Close">
-        			<span aria-hidden="true">&times;</span>
-      			</button>
-    		</div>
-    		<div class="modal-body">
-      			<p>{{bodyDeletarEvento}}</p>
-    		</div>    
-    		<div class="modal-footer btn-group d-flex">      
-      			<button type="button" class="btn btn-outline-primary" (click)="confirm.hide()">
-        			CENCELAR
-      			</button>
-      			<button type="button" class="btn btn-outline-danger" (click)="confirmeDelete(confirm)">
-          			DELETAR
-        		</button>
-    		</div>
-  		</div>
-	</div>
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left">
+          Deletando Evento
+        </h4>
+        <button type="button" class="close pull-right" (click)="confirm.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{bodyDeletarEvento}}</p>
+      </div>    
+      <div class="modal-footer btn-group d-flex">      
+        <button type="button" class="btn btn-outline-primary" (click)="confirm.hide()">
+          CENCELAR
+        </button>
+        <button type="button" class="btn btn-outline-danger" (click)="confirmeDelete(confirm)">
+          DELETAR
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
-
-
-

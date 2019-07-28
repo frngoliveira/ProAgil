@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, Optional } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { EventoService } from '../_services/evento.service';
 import { Evento } from '../_models/Evento';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap';
@@ -18,28 +18,33 @@ export class EventosComponent implements OnInit {
 
   titulo = 'Eventos';
 
+  dataEvento: string;
+
   eventosFiltrados: Evento[];
-  eventos: Evento[] = [];
+  eventos: Evento[] ;
   evento: Evento;
   modoSalvar = 'post';
+
   imagemAltura = 50;
   imagemMargem = 2;
   mostrarImagem = false;
   registerForm: FormGroup;
   bodyDeletarEvento = '';
 
+  file: File;
+  fileNameToUpdate: any;
+  dataAtual: string;
+
   // tslint:disable-next-line:variable-name
   _filtroLista: string;
 
+
   constructor(
       private eventoService: EventoService
-    // tslint:disable-next-line:align
     , private modalService: BsModalService
-    // tslint:disable-next-line:align
     , private fb: FormBuilder
+    , private localeService: BsLocaleService
     , private toastr: ToastrService
-    // tslint:disable-next-line:align
-    , private localeService?: BsLocaleService
     ) {
       this.localeService.use('pt-br');
     }
@@ -56,8 +61,10 @@ export class EventosComponent implements OnInit {
     editarEvento(evento: Evento, template: any) {
       this.modoSalvar = 'put';
       this.openModal(template);
-      this.evento = evento;
-      this.registerForm.patchValue(evento);
+      this.evento = Object.assign({}, evento);
+      this.fileNameToUpdate = evento.imagemURL.toString();
+      this.evento.imagemURL = '';
+      this.registerForm.patchValue(this.evento);
     }
 
     novoEvento(template: any) {
@@ -124,27 +131,66 @@ export class EventosComponent implements OnInit {
         });
       }
 
+      onFileChange(event) {
+        const reader = new FileReader();
+
+        if (event.target.files && event.target.files.length) {
+          this.file = event.target.files;
+          console.log(this.file);
+        }
+      }
+      uploadImagem() {
+        if (this.modoSalvar === 'post') {
+          const nomeArquivo = this.evento.imagemURL.split('\\', 3);
+          this.evento.imagemURL = nomeArquivo[2];
+
+          this.eventoService.postUpload(this.file, nomeArquivo[2])
+          .subscribe(
+            () => {
+              this.dataAtual = new Date().getMilliseconds().toString();
+              this.getEventos();
+            }
+          );
+        } else {
+          this.evento.imagemURL = this.fileNameToUpdate;
+          this.eventoService.postUpload(this.file, this.fileNameToUpdate)
+          .subscribe(
+            () => {
+              this.dataAtual = new Date().getMilliseconds().toString();
+              this.getEventos();
+            }
+          );
+        }
+      }
+
+
       salvarAlteracao(template: any) {
         if (this.registerForm.valid) {
           if (this.modoSalvar === 'post') {
             this.evento = Object.assign({}, this.registerForm.value);
+
+            this.uploadImagem();
+
             this.eventoService.postEvento(this.evento).subscribe(
               (novoEvento: Evento) => {
                 template.hide();
                 this.getEventos();
                 this.toastr.success('Inserido com Sucesso');
               }, error => {
-                console.log(error);
+                this.toastr.error('Erro ao Inserir: ${error}');
               });
             } else {
               this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+
+              this.uploadImagem();
+
               this.eventoService.putEvento(this.evento).subscribe(
                 () => {
                   template.hide();
                   this.getEventos();
                   this.toastr.success('Editado com Sucesso');
                 }, error => {
-                  this.toastr.error('Erro ao Inserir: ${error}');
+                  this.toastr.error('Erro ao Atualizar: ${error}');
                 });
               }
             }
@@ -162,3 +208,4 @@ export class EventosComponent implements OnInit {
               });
             }
           }
+
