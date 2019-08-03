@@ -139,6 +139,7 @@ export class EventosComponent implements OnInit {
           console.log(this.file);
         }
       }
+
       uploadImagem() {
         if (this.modoSalvar === 'post') {
           const nomeArquivo = this.evento.imagemURL.split('\\', 3);
@@ -201,6 +202,7 @@ export class EventosComponent implements OnInit {
             .subscribe(
               // tslint:disable-next-line:variable-name
               (_eventos: Evento[]) => {
+
                 this.eventos = _eventos;
                 this.eventosFiltrados = this.eventos;
               }, error => {
