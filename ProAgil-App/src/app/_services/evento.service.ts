@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Evento } from '../_models/Evento';
 
@@ -9,7 +9,8 @@ import { Evento } from '../_models/Evento';
 })
 export class EventoService {
 
-  baseUrl = 'http://localhost:5000/Api/evento';
+  baseUrl = 'http://localhost:5000/api/evento';
+
 
   constructor(private http: HttpClient) { }
 
@@ -23,7 +24,7 @@ export class EventoService {
     return this.http.get<Evento>(`${this.baseUrl}/${id}`);
   }
   postUpload(file: File, name: string) {
-    const fileToUpload = file[0] as File;
+    const fileToUpload = file[0];
     const formData = new FormData();
     formData.append('file', fileToUpload, name);
 
